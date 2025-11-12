@@ -1,0 +1,32 @@
+/* Navbar.css */
+/* Modern Themed Navbar */
+.navbar-custom {
+  background: linear-gradient(90deg, #2b2c79 0%, #5e95d7 100%);
+  box-shadow: 0 2px 8px 0 rgba(99,102,241,0.10);
+  padding: 0.75rem 2rem;
+}
+
+.navbar-custom .navbar-brand {
+  color: #fff !important;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 1.5rem;
+}
+
+.navbar-custom .nav-link {
+  color: white !important;
+  font-weight: 500;
+  margin-left: 1rem;
+  transition: color 0.2s;
+}
+
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link.active {
+  color: #fff !important;
+  text-decoration: underline;
+}
+
+.navbar-custom .navbar-toggler {
+  border: none;
+  background: #6366f1;
+}
