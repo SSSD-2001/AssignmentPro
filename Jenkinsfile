@@ -23,8 +23,8 @@ pipeline {
                 echo 'Building Backend Docker Image...'
                 script {
                     dir('backend') {
-                        sh "docker build -t ${BACKEND_IMAGE}:${BUILD_NUMBER} ."
-                        sh "docker tag ${BACKEND_IMAGE}:${BUILD_NUMBER} ${BACKEND_IMAGE}:latest"
+                        bat "docker build -t ${BACKEND_IMAGE}:${BUILD_NUMBER} ."
+                        bat "docker tag ${BACKEND_IMAGE}:${BUILD_NUMBER} ${BACKEND_IMAGE}:latest"
                     }
                 }
             }
@@ -35,8 +35,8 @@ pipeline {
                 echo 'Building Frontend Docker Image...'
                 script {
                     dir('frontend') {
-                        sh "docker build -t ${FRONTEND_IMAGE}:${BUILD_NUMBER} ."
-                        sh "docker tag ${FRONTEND_IMAGE}:${BUILD_NUMBER} ${FRONTEND_IMAGE}:latest"
+                        bat "docker build -t ${FRONTEND_IMAGE}:${BUILD_NUMBER} ."
+                        bat "docker tag ${FRONTEND_IMAGE}:${BUILD_NUMBER} ${FRONTEND_IMAGE}:latest"
                     }
                 }
             }
@@ -45,31 +45,31 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 echo 'Logging in to Docker Hub...'
-                sh 'echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin'
+                bat 'echo %DOCKER_HUB_CREDENTIALS_PSW% | docker login -u %DOCKER_HUB_CREDENTIALS_USR% --password-stdin'
             }
         }
         
         stage('Push Backend Image') {
             steps {
                 echo 'Pushing Backend Image to Docker Hub...'
-                sh "docker push ${BACKEND_IMAGE}:${BUILD_NUMBER}"
-                sh "docker push ${BACKEND_IMAGE}:latest"
+                bat "docker push ${BACKEND_IMAGE}:${BUILD_NUMBER}"
+                bat "docker push ${BACKEND_IMAGE}:latest"
             }
         }
         
         stage('Push Frontend Image') {
             steps {
                 echo 'Pushing Frontend Image to Docker Hub...'
-                sh "docker push ${FRONTEND_IMAGE}:${BUILD_NUMBER}"
-                sh "docker push ${FRONTEND_IMAGE}:latest"
+                bat "docker push ${FRONTEND_IMAGE}:${BUILD_NUMBER}"
+                bat "docker push ${FRONTEND_IMAGE}:latest"
             }
         }
         
         stage('Cleanup') {
             steps {
                 echo 'Cleaning up local images...'
-                sh "docker rmi ${BACKEND_IMAGE}:${BUILD_NUMBER} ${BACKEND_IMAGE}:latest || true"
-                sh "docker rmi ${FRONTEND_IMAGE}:${BUILD_NUMBER} ${FRONTEND_IMAGE}:latest || true"
+                bat "docker rmi ${BACKEND_IMAGE}:${BUILD_NUMBER} ${BACKEND_IMAGE}:latest || exit 0"
+                bat "docker rmi ${FRONTEND_IMAGE}:${BUILD_NUMBER} ${FRONTEND_IMAGE}:latest || exit 0"
             }
         }
     }
@@ -88,7 +88,7 @@ pipeline {
         }
         always {
             echo 'Logging out from Docker Hub...'
-            sh 'docker logout || true'
+            bat 'docker logout || exit 0'
         }
     }
 }
