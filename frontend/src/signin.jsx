@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 import "./signin.css";
 
 
@@ -11,6 +12,7 @@ function SignIn() {
     });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -22,15 +24,16 @@ function SignIn() {
         setLoading(true);
         try {
             const normalizedUsername = formData.username.trim().toLowerCase();
-            const res = await axios.post("http://localhost:3000/signup", {
+            const res = await axios.post("http://localhost:3000/signin", {
                 ...formData,
                 username: normalizedUsername
             });
             if (res.data && res.data.user) {
+                login(res.data.user);
                 navigate("/dashboard", { state: { user: res.data.user } });
             }
         } catch (error) {
-            alert(error?.response?.data || error.message || error);
+            alert(error?.response?.data?.message || error.message || error);
         } finally {
             setLoading(false);
         }

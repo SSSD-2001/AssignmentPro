@@ -1,9 +1,14 @@
 
 
+
+
 import React from 'react';
+import { useAuth } from './AuthContext';
 import './home.css';
 
 function Home() {
+  const { user } = useAuth();
+
   return (
     <div className="home-bg container-fluid p-0">
       {/* Hero Section */}
@@ -13,8 +18,14 @@ function Home() {
           <p className="lead mb-4" style={{ fontSize: '1.5rem' }}>
             Empowering teachers and students to collaborate, manage, and excel in academic assignments—anytime, anywhere.
           </p>
-          <a href="/signup" className="btn btn-lg hero-btn font-weight-bold">Get Started</a>
-          <a href="/signin" className="btn btn-lg hero-btn font-weight-bold">Sign In</a>
+          {user ? (
+            <a href="/dashboard" className="btn btn-lg hero-btn font-weight-bold">Go to Dashboard</a>
+          ) : (
+            <>
+              <a href="/signup" className="btn btn-lg hero-btn font-weight-bold">Get Started</a>
+              <a href="/signin" className="btn btn-lg hero-btn font-weight-bold">Sign In</a>
+            </>
+          )}
         </div>
       </section>
 
@@ -64,11 +75,13 @@ function Home() {
       </section>
 
       {/* Call to Action */}
-      <section className="cta-section text-center py-5">
-        <h2 className="mb-3 font-weight-bold">Ready to get started?</h2>
-        <a href="/signup" className="btn btn-lg cta-btn font-weight-bold">Create an Account</a>
-        <a href="/signin" className="btn btn-lg cta-btn font-weight-bold">Sign In</a>
-      </section>
+      {!user && (
+        <section className="cta-section text-center py-5">
+          <h2 className="mb-3 font-weight-bold">Ready to get started?</h2>
+          <a href="/signup" className="btn btn-lg cta-btn font-weight-bold">Create an Account</a>
+          <a href="/signin" className="btn btn-lg cta-btn font-weight-bold">Sign In</a>
+        </section>
+      )}
     </div>
   );
 }

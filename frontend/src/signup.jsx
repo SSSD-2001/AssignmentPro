@@ -1,16 +1,19 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 import "./signup.css";
 
 
 function SignUp() {
   const [formData, setFormData] = useState({
     username: "",
-    password: ""
+    password: "",
+    role: "student"
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,11 +25,15 @@ function SignUp() {
     setLoading(true);
     try {
       const normalizedUsername = formData.username.trim().toLowerCase();
-      const res = await axios.post("http://localhost:3000/signup", {
+      const payload = {
         ...formData,
         username: normalizedUsername
-      });
+      };
+      console.log('Signup payload:', payload); // Debug
+      const res = await axios.post("http://localhost:3000/signup", payload);
+      console.log('Signup response:', res.data); // Debug
       if (res.data && res.data.user) {
+        login(res.data.user);
         navigate("/dashboard", { state: { user: res.data.user } });
       }
     } catch (error) {
@@ -58,7 +65,7 @@ function SignUp() {
               autoComplete="username"
             />
           </div>
-          <div className="form-group mb-4">
+          <div className="form-group mb-3">
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -71,6 +78,39 @@ function SignUp() {
               onChange={handleChange}
               autoComplete="new-password"
             />
+          </div>
+          <div className="form-group mb-4">
+            <label className="d-block mb-2">I am a:</label>
+            <div className="d-flex gap-4">
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="role"
+                  id="roleStudent"
+                  value="student"
+                  checked={formData.role === 'student'}
+                  onChange={handleChange}
+                />
+                <label className="form-check-label" htmlFor="roleStudent">
+                  Student
+                </label>
+              </div>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="role"
+                  id="roleTeacher"
+                  value="teacher"
+                  checked={formData.role === 'teacher'}
+                  onChange={handleChange}
+                />
+                <label className="form-check-label" htmlFor="roleTeacher">
+                  Teacher
+                </label>
+              </div>
+            </div>
           </div>
           <button type="submit" className="auth-btn btn btn-block w-100" disabled={loading}>
             {loading ? 'Signing Up...' : 'Sign Up'}
