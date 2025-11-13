@@ -1,0 +1,105 @@
+/* Teacher Dashboard Styles */
+.teacher-dashboard {
+  background: linear-gradient(135deg, #fef3c7 0%, #dbeafe 100%);
+  min-height: 100vh;
+  padding-top: 2rem;
+}
+
+.teacher-header-card {
+  background: linear-gradient(120deg, #7c3aed 0%, #2563eb 100%);
+  color: white;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.2);
+}
+
+.teacher-stat-card {
+  background: white;
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #e5e7eb;
+}
+
+.teacher-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(124, 58, 237, 0.15);
+}
+
+.teacher-stat-icon {
+  font-size: 2.5rem;
+  color: #7c3aed;
+}
+
+.teacher-create-btn {
+  background: linear-gradient(90deg, #7c3aed 0%, #2563eb 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.75rem 2rem;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.teacher-create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+  background: linear-gradient(90deg, #6d28d9 0%, #1d4ed8 100%);
+}
+
+.teacher-table-card {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.teacher-table-card h4 {
+  color: #7c3aed;
+  font-weight: bold;
+}
+
+.teacher-table {
+  margin-bottom: 0;
+}
+
+.teacher-table thead {
+  background: linear-gradient(90deg, #f3e8ff 0%, #dbeafe 100%);
+}
+
+.teacher-table thead th {
+  color: #5b21b6;
+  font-weight: 600;
+  border: none;
+  padding: 1rem;
+}
+
+.teacher-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.teacher-action-btn {
+  margin-right: 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.teacher-badge {
+  background: linear-gradient(90deg, #7c3aed 0%, #2563eb 100%);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .teacher-stat-card {
+    margin-bottom: 1rem;
+  }
+  
+  .teacher-create-btn {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}

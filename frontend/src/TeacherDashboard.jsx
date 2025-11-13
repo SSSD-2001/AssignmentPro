@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "./AuthContext";
-import './home.css';
+import './teacherDashboard.css';
 
 function TeacherDashboard() {
   const { user } = useAuth();
@@ -11,16 +11,16 @@ function TeacherDashboard() {
   ]);
 
   return (
-    <div className="home-bg" style={{ minHeight: '100vh', paddingTop: '2rem' }}>
+    <div className="teacher-dashboard">
       <div className="container">
         {/* Header */}
         <div className="row mb-4">
           <div className="col-12">
-            <div className="card feature-card p-4">
+            <div className="card teacher-header-card p-4">
               <h2 className="mb-2">
-                Welcome, <span style={{ color: '#6366f1' }}>{user?.username}</span>!
+                Welcome, <span style={{ color: '#fbbf24' }}>{user?.username}</span>!
               </h2>
-              <p className="text-muted mb-0">Teacher Dashboard</p>
+              <p className="mb-0" style={{ opacity: 0.9 }}>Teacher Dashboard</p>
             </div>
           </div>
         </div>
@@ -28,9 +28,9 @@ function TeacherDashboard() {
         {/* Stats Cards */}
         <div className="row mb-4">
           <div className="col-md-4 mb-3">
-            <div className="card feature-card h-100">
+            <div className="card teacher-stat-card h-100">
               <div className="card-body text-center">
-                <div style={{ fontSize: '2.5rem', color: '#6366f1' }}>
+                <div className="teacher-stat-icon">
                   <i className="bi bi-journal-text"></i>
                 </div>
                 <h3 className="mt-2">{assignments.length}</h3>
@@ -39,9 +39,9 @@ function TeacherDashboard() {
             </div>
           </div>
           <div className="col-md-4 mb-3">
-            <div className="card feature-card h-100">
+            <div className="card teacher-stat-card h-100">
               <div className="card-body text-center">
-                <div style={{ fontSize: '2.5rem', color: '#6366f1' }}>
+                <div className="teacher-stat-icon">
                   <i className="bi bi-people"></i>
                 </div>
                 <h3 className="mt-2">45</h3>
@@ -50,9 +50,9 @@ function TeacherDashboard() {
             </div>
           </div>
           <div className="col-md-4 mb-3">
-            <div className="card feature-card h-100">
+            <div className="card teacher-stat-card h-100">
               <div className="card-body text-center">
-                <div style={{ fontSize: '2.5rem', color: '#6366f1' }}>
+                <div className="teacher-stat-icon">
                   <i className="bi bi-check-circle"></i>
                 </div>
                 <h3 className="mt-2">27</h3>
@@ -65,7 +65,7 @@ function TeacherDashboard() {
         {/* Create Assignment Button */}
         <div className="row mb-4">
           <div className="col-12">
-            <button className="btn hero-btn btn-lg">
+            <button className="btn teacher-create-btn btn-lg">
               <i className="bi bi-plus-circle me-2"></i>
               Create New Assignment
             </button>
@@ -75,11 +75,11 @@ function TeacherDashboard() {
         {/* Assignments List */}
         <div className="row">
           <div className="col-12">
-            <div className="card feature-card">
+            <div className="card teacher-table-card">
               <div className="card-body">
                 <h4 className="mb-4">Your Assignments</h4>
                 <div className="table-responsive">
-                  <table className="table">
+                  <table className="table teacher-table">
                     <thead>
                       <tr>
                         <th>Assignment Title</th>
@@ -94,16 +94,16 @@ function TeacherDashboard() {
                           <td>{assignment.title}</td>
                           <td>{assignment.dueDate}</td>
                           <td>
-                            <span className="badge bg-primary">{assignment.submissions} submissions</span>
+                            <span className="badge teacher-badge">{assignment.submissions} submissions</span>
                           </td>
                           <td>
-                            <button className="btn btn-sm btn-outline-primary me-2">
+                            <button className="btn btn-sm btn-outline-primary teacher-action-btn">
                               <i className="bi bi-eye"></i> View
                             </button>
-                            <button className="btn btn-sm btn-outline-secondary me-2">
+                            <button className="btn btn-sm btn-outline-secondary teacher-action-btn">
                               <i className="bi bi-pencil"></i> Edit
                             </button>
-                            <button className="btn btn-sm btn-outline-danger">
+                            <button className="btn btn-sm btn-outline-danger teacher-action-btn">
                               <i className="bi bi-trash"></i> Delete
                             </button>
                           </td>

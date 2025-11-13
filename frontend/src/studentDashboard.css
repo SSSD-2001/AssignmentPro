@@ -1,0 +1,115 @@
+/* Student Dashboard Styles */
+.student-dashboard {
+  background: linear-gradient(135deg, #fce7f3 0%, #e0f2fe 100%);
+  min-height: 100vh;
+  padding-top: 2rem;
+}
+
+.student-header-card {
+  background: linear-gradient(120deg, #ec4899 0%, #06b6d4 100%);
+  color: white;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.2);
+}
+
+.student-stat-card {
+  background: white;
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #e5e7eb;
+}
+
+.student-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(236, 72, 153, 0.15);
+}
+
+.student-stat-icon-pending {
+  font-size: 2.5rem;
+  color: #f59e0b;
+}
+
+.student-stat-icon-submitted {
+  font-size: 2.5rem;
+  color: #3b82f6;
+}
+
+.student-stat-icon-graded {
+  font-size: 2.5rem;
+  color: #10b981;
+}
+
+.student-table-card {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.student-table-card h4 {
+  color: #ec4899;
+  font-weight: bold;
+}
+
+.student-table {
+  margin-bottom: 0;
+}
+
+.student-table thead {
+  background: linear-gradient(90deg, #fce7f3 0%, #e0f2fe 100%);
+}
+
+.student-table thead th {
+  color: #be185d;
+  font-weight: 600;
+  border: none;
+  padding: 1rem;
+}
+
+.student-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.student-action-btn {
+  font-size: 0.875rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.student-badge-pending {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.student-badge-submitted {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.student-badge-graded {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.student-grade {
+  color: #ec4899;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .student-stat-card {
+    margin-bottom: 1rem;
+  }
+}
