@@ -1,14 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import axios from "axios";
 import './teacherDashboard.css';
 
 function TeacherDashboard() {
   const { user } = useAuth();
-  const [assignments, setAssignments] = useState([
-    // Sample data - will be from database later
-    { id: 1, title: "Math Assignment 1", dueDate: "2025-11-20", submissions: 15 },
-    { id: 2, title: "Science Project", dueDate: "2025-11-25", submissions: 12 },
-  ]);
+  const [assignments, setAssignments] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    dueDate: "",
+    maxScore: 100
+  });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
+
+  const fetchAssignments = async () => {
+    try {
+      const res = await axios.get(`/api/assignments?teacherUsername=${user?.username}`);
+      setAssignments(res.data.assignments || []);
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await axios.post('/api/assignments', {
+        ...formData,
+        teacherUsername: user?.username
+      });
+      alert('Assignment created successfully!');
+      setShowModal(false);
+      setFormData({ title: "", description: "", dueDate: "", maxScore: 100 });
+      fetchAssignments(); // Refresh the list
+    } catch (error) {
+      alert(error?.response?.data?.message || 'Error creating assignment');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this assignment?')) return;
+    try {
+      await axios.delete(`/api/assignments/${id}`);
+      alert('Assignment deleted successfully!');
+      fetchAssignments();
+    } catch (error) {
+      alert('Error deleting assignment');
+    }
+  };
 
   return (
     <div className="teacher-dashboard">
@@ -65,7 +118,10 @@ function TeacherDashboard() {
         {/* Create Assignment Button */}
         <div className="row mb-4">
           <div className="col-12">
-            <button className="btn teacher-create-btn btn-lg">
+            <button 
+              className="btn teacher-create-btn btn-lg"
+              onClick={() => setShowModal(true)}
+            >
               <i className="bi bi-plus-circle me-2"></i>
               Create New Assignment
             </button>
@@ -89,26 +145,35 @@ function TeacherDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {assignments.map(assignment => (
-                        <tr key={assignment.id}>
-                          <td>{assignment.title}</td>
-                          <td>{assignment.dueDate}</td>
-                          <td>
-                            <span className="badge teacher-badge">{assignment.submissions} submissions</span>
-                          </td>
-                          <td>
-                            <button className="btn btn-sm btn-outline-primary teacher-action-btn">
-                              <i className="bi bi-eye"></i> View
-                            </button>
-                            <button className="btn btn-sm btn-outline-secondary teacher-action-btn">
-                              <i className="bi bi-pencil"></i> Edit
-                            </button>
-                            <button className="btn btn-sm btn-outline-danger teacher-action-btn">
-                              <i className="bi bi-trash"></i> Delete
-                            </button>
-                          </td>
+                      {assignments.length === 0 ? (
+                        <tr>
+                          <td colSpan="4" className="text-center">No assignments yet. Create your first assignment!</td>
                         </tr>
-                      ))}
+                      ) : (
+                        assignments.map(assignment => (
+                          <tr key={assignment._id}>
+                            <td>{assignment.title}</td>
+                            <td>{new Date(assignment.dueDate).toLocaleDateString()}</td>
+                            <td>
+                              <span className="badge teacher-badge">0 submissions</span>
+                            </td>
+                            <td>
+                              <button className="btn btn-sm btn-outline-primary teacher-action-btn">
+                                <i className="bi bi-eye"></i> View
+                              </button>
+                              <button className="btn btn-sm btn-outline-secondary teacher-action-btn">
+                                <i className="bi bi-pencil"></i> Edit
+                              </button>
+                              <button 
+                                className="btn btn-sm btn-outline-danger teacher-action-btn"
+                                onClick={() => handleDelete(assignment._id)}
+                              >
+                                <i className="bi bi-trash"></i> Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -117,6 +182,87 @@ function TeacherDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Create Assignment Modal */}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Create New Assignment</h3>
+              <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="modal-body">
+                <div className="form-group mb-3">
+                  <label>Assignment Title *</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="e.g., Math Quiz 1"
+                  />
+                </div>
+                <div className="form-group mb-3">
+                  <label>Description *</label>
+                  <textarea
+                    className="form-control"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    required
+                    rows="4"
+                    placeholder="Describe the assignment requirements..."
+                  />
+                </div>
+                <div className="form-group mb-3">
+                  <label>Due Date *</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="dueDate"
+                    value={formData.dueDate}
+                    onChange={handleInputChange}
+                    required
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+                <div className="form-group mb-3">
+                  <label>Max Score</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    name="maxScore"
+                    value={formData.maxScore}
+                    onChange={handleInputChange}
+                    min="1"
+                    placeholder="100"
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary"
+                  onClick={() => setShowModal(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn teacher-create-btn"
+                  disabled={loading}
+                >
+                  {loading ? 'Creating...' : 'Create Assignment'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

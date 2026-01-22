@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import User from './user.js';
+import Assignment from './assignment.js';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -74,6 +75,89 @@ app.post('/signin', async (req, res) => {
     } catch (e) {
         console.error(e);
         res.status(500).send('Error signing in');
+    }
+});
+
+
+// Assignment endpoints
+app.post('/assignments', async (req, res) => {
+    try {
+        const { title, description, dueDate, teacherUsername, maxScore } = req.body;
+        
+        if (!title || !description || !dueDate || !teacherUsername) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const assignment = new Assignment({
+            title,
+            description,
+            dueDate,
+            teacherUsername,
+            maxScore: maxScore || 100
+        });
+
+        await assignment.save();
+        console.log('Assignment created:', assignment);
+        res.status(201).json({ message: 'Assignment created successfully', assignment });
+    } catch (e) {
+        console.error('Error creating assignment:', e);
+        res.status(500).json({ message: 'Error creating assignment' });
+    }
+});
+
+app.get('/assignments', async (req, res) => {
+    try {
+        const { teacherUsername } = req.query;
+        const filter = teacherUsername ? { teacherUsername } : {};
+        const assignments = await Assignment.find(filter).sort({ createdAt: -1 });
+        res.json({ assignments });
+    } catch (e) {
+        console.error('Error fetching assignments:', e);
+        res.status(500).json({ message: 'Error fetching assignments' });
+    }
+});
+
+app.get('/assignments/:id', async (req, res) => {
+    try {
+        const assignment = await Assignment.findById(req.params.id);
+        if (!assignment) {
+            return res.status(404).json({ message: 'Assignment not found' });
+        }
+        res.json({ assignment });
+    } catch (e) {
+        console.error('Error fetching assignment:', e);
+        res.status(500).json({ message: 'Error fetching assignment' });
+    }
+});
+
+app.put('/assignments/:id', async (req, res) => {
+    try {
+        const { title, description, dueDate, maxScore } = req.body;
+        const assignment = await Assignment.findByIdAndUpdate(
+            req.params.id,
+            { title, description, dueDate, maxScore },
+            { new: true }
+        );
+        if (!assignment) {
+            return res.status(404).json({ message: 'Assignment not found' });
+        }
+        res.json({ message: 'Assignment updated successfully', assignment });
+    } catch (e) {
+        console.error('Error updating assignment:', e);
+        res.status(500).json({ message: 'Error updating assignment' });
+    }
+});
+
+app.delete('/assignments/:id', async (req, res) => {
+    try {
+        const assignment = await Assignment.findByIdAndDelete(req.params.id);
+        if (!assignment) {
+            return res.status(404).json({ message: 'Assignment not found' });
+        }
+        res.json({ message: 'Assignment deleted successfully' });
+    } catch (e) {
+        console.error('Error deleting assignment:', e);
+        res.status(500).json({ message: 'Error deleting assignment' });
     }
 });
 
