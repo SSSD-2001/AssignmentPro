@@ -19,7 +19,7 @@ resource "aws_lb" "main" {
 
 # Target Group for Frontend
 resource "aws_lb_target_group" "frontend" {
-  name        = "assignmentpro-${var.environment}-frontend"
+  name        = "apro-${var.environment}-frontend"
   port        = 4000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -41,7 +41,7 @@ resource "aws_lb_target_group" "frontend" {
 
 # Target Group for Backend API
 resource "aws_lb_target_group" "backend" {
-  name        = "assignmentpro-${var.environment}-backend"
+  name        = "apro-${var.environment}-backend"
   port        = 3000
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -77,20 +77,15 @@ resource "aws_lb_target_group_attachment" "backend" {
   port             = 3000
 }
 
-# HTTP Listener (redirect to HTTPS)
+# HTTP Listener (serves traffic directly - no SSL)
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
   }
 }
 

@@ -26,7 +26,6 @@ provider "aws" {
       Project     = "AssignmentPro"
       Environment = var.environment
       ManagedBy   = "Terraform"
-      CreatedAt   = timestamp()
     }
   }
 }
@@ -81,33 +80,4 @@ module "alb" {
   frontend_instances  = module.ec2.instance_ids
 
   depends_on = [module.ec2]
-}
-
-# Outputs
-output "alb_dns_name" {
-  description = "DNS name of the load balancer"
-  value       = module.alb.alb_dns_name
-}
-
-output "alb_arn" {
-  description = "ARN of the load balancer"
-  value       = module.alb.alb_arn
-}
-
-output "ec2_instance_ids" {
-  description = "IDs of EC2 instances"
-  value       = module.ec2.instance_ids
-}
-
-output "vpc_id" {
-  description = "ID of the VPC"
-  value       = module.vpc.vpc_id
-}
-
-output "security_group_ids" {
-  description = "Security group IDs"
-  value = {
-    alb = module.security.alb_security_group_id
-    ec2 = module.security.ec2_security_group_id
-  }
 }

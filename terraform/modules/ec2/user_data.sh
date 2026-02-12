@@ -89,8 +89,8 @@ EOF
 # Create monitoring script
 cat > /usr/local/bin/health-check.sh << 'EOF'
 #!/bin/bash
-frontend_status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000)
-backend_status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)
+frontend_status=$(curl -s -o /dev/null -w "%%{http_code}" http://localhost:4000)
+backend_status=$(curl -s -o /dev/null -w "%%{http_code}" http://localhost:3000)
 mongo_status=$(docker exec $(docker ps -q -f "ancestor=mongo:7") mongo --eval "db.adminCommand('ping')" 2>/dev/null)
 
 echo "Frontend: $frontend_status"
