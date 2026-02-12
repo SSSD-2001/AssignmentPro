@@ -17,6 +17,10 @@ const assignmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    assignedTo: {
+        type: [String], // Array of student usernames
+        default: []
+    },
     createdAt: {
         type: Date,
         default: Date.now
