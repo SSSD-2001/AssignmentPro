@@ -30,7 +30,7 @@ function SignUp() {
         username: normalizedUsername
       };
       console.log('Signup payload:', payload); // Debug
-      const res = await axios.post("http://localhost:3000/signup", payload);
+      const res = await axios.post("/api/signup", payload);
       console.log('Signup response:', res.data); // Debug
       if (res.data && res.data.user) {
         login(res.data.user);

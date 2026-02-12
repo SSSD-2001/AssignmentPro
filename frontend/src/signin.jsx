@@ -24,7 +24,7 @@ function SignIn() {
         setLoading(true);
         try {
             const normalizedUsername = formData.username.trim().toLowerCase();
-            const res = await axios.post("http://localhost:3000/signin", {
+            const res = await axios.post("/api/signin", {
                 ...formData,
                 username: normalizedUsername
             });
