@@ -6,17 +6,20 @@ import './teacherDashboard.css';
 function TeacherDashboard() {
   const { user } = useAuth();
   const [assignments, setAssignments] = useState([]);
+  const [students, setStudents] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     dueDate: "",
-    maxScore: 100
+    maxScore: 100,
+    assignedTo: []
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchAssignments();
+    fetchStudents();
   }, []);
 
   const fetchAssignments = async () => {
@@ -28,13 +31,52 @@ function TeacherDashboard() {
     }
   };
 
+  const fetchStudents = async () => {
+    try {
+      const res = await axios.get('/api/users/students');
+      setStudents(res.data.students || []);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleStudentSelection = (studentUsername) => {
+    setFormData(prev => {
+      const isSelected = prev.assignedTo.includes(studentUsername);
+      return {
+        ...prev,
+        assignedTo: isSelected
+          ? prev.assignedTo.filter(s => s !== studentUsername)
+          : [...prev.assignedTo, studentUsername]
+      };
+    });
+  };
+
+  const selectAllStudents = () => {
+    setFormData(prev => ({
+      ...prev,
+      assignedTo: students.map(s => s.username)
+    }));
+  };
+
+  const deselectAllStudents = () => {
+    setFormData(prev => ({
+      ...prev,
+      assignedTo: []
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.assignedTo.length === 0) {
+      alert('Please select at least one student');
+      return;
+    }
     setLoading(true);
     try {
       await axios.post('/api/assignments', {
@@ -43,8 +85,8 @@ function TeacherDashboard() {
       });
       alert('Assignment created successfully!');
       setShowModal(false);
-      setFormData({ title: "", description: "", dueDate: "", maxScore: 100 });
-      fetchAssignments(); // Refresh the list
+      setFormData({ title: "", description: "", dueDate: "", maxScore: 100, assignedTo: [] });
+      fetchAssignments();
     } catch (error) {
       alert(error?.response?.data?.message || 'Error creating assignment');
     } finally {
@@ -155,7 +197,9 @@ function TeacherDashboard() {
                             <td>{assignment.title}</td>
                             <td>{new Date(assignment.dueDate).toLocaleDateString()}</td>
                             <td>
-                              <span className="badge teacher-badge">0 submissions</span>
+                              <span className="badge teacher-badge">
+                                {assignment.assignedTo?.length || 0} students assigned
+                              </span>
                             </td>
                             <td>
                               <button className="btn btn-sm btn-outline-primary teacher-action-btn">
@@ -240,6 +284,57 @@ function TeacherDashboard() {
                     min="1"
                     placeholder="100"
                   />
+                </div>
+                <div className="form-group mb-3">
+                  <label>Assign to Students *</label>
+                  <div className="mb-2">
+                    <button 
+                      type="button" 
+                      className="btn btn-sm btn-outline-primary me-2"
+                      onClick={selectAllStudents}
+                    >
+                      Select All
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn btn-sm btn-outline-secondary"
+                      onClick={deselectAllStudents}
+                    >
+                      Deselect All
+                    </button>
+                    <span className="ms-2 text-muted">
+                      ({formData.assignedTo.length} selected)
+                    </span>
+                  </div>
+                  <div className="student-selection-box" style={{
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    border: '1px solid #dee2e6',
+                    borderRadius: '4px',
+                    padding: '10px'
+                  }}>
+                    {students.length === 0 ? (
+                      <p className="text-muted mb-0">No students found</p>
+                    ) : (
+                      students.map(student => (
+                        <div key={student.username} className="form-check mb-2">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            id={`student-${student.username}`}
+                            checked={formData.assignedTo.includes(student.username)}
+                            onChange={() => handleStudentSelection(student.username)}
+                          />
+                          <label 
+                            className="form-check-label" 
+                            htmlFor={`student-${student.username}`}
+                          >
+                            {student.username}
+                          </label>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="modal-footer">

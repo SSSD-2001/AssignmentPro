@@ -1,15 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import axios from "axios";
 import './studentDashboard.css';
 
 function StudentDashboard() {
   const { user } = useAuth();
-  const [assignments, setAssignments] = useState([
-    // Sample data - will be from database later
-    { id: 1, title: "Math Assignment 1", dueDate: "2025-11-20", status: "pending", grade: null },
-    { id: 2, title: "Science Project", dueDate: "2025-11-25", status: "submitted", grade: null },
-    { id: 3, title: "History Essay", dueDate: "2025-11-15", status: "graded", grade: 85 },
-  ]);
+  const [assignments, setAssignments] = useState([]);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [submissionText, setSubmissionText] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
+
+  const fetchAssignments = async () => {
+    try {
+      const res = await axios.get(`/api/assignments/student/${user?.username}`);
+      setAssignments(res.data.assignments || []);
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
+    }
+  };
+
+  const openSubmitModal = (assignment) => {
+    setSelectedAssignment(assignment);
+    setSubmissionText(assignment.submission?.submissionText || '');
+    setShowSubmitModal(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!submissionText.trim()) {
+      alert('Please enter your submission');
+      return;
+    }
+    setLoading(true);
+    try {
+      await axios.post(`/api/assignments/${selectedAssignment._id}/submit`, {
+        studentUsername: user?.username,
+        submissionText
+      });
+      alert('Assignment submitted successfully!');
+      setShowSubmitModal(false);
+      setSubmissionText('');
+      setSelectedAssignment(null);
+      fetchAssignments();
+    } catch (error) {
+      alert(error?.response?.data?.message || 'Error submitting assignment');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusBadge = (status) => {
     switch(status) {
@@ -98,39 +141,54 @@ function StudentDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {assignments.map(assignment => (
-                        <tr key={assignment.id}>
-                          <td>{assignment.title}</td>
-                          <td>{assignment.dueDate}</td>
-                          <td>{getStatusBadge(assignment.status)}</td>
-                          <td>
-                            {assignment.grade !== null ? (
-                              <span className="student-grade">
-                                {assignment.grade}%
-                              </span>
-                            ) : (
-                              <span className="text-muted">-</span>
-                            )}
-                          </td>
-                          <td>
-                            {assignment.status === 'pending' && (
-                              <button className="btn btn-sm btn-primary student-action-btn">
-                                <i className="bi bi-upload"></i> Submit
-                              </button>
-                            )}
-                            {assignment.status === 'submitted' && (
-                              <button className="btn btn-sm btn-outline-secondary student-action-btn">
-                                <i className="bi bi-eye"></i> View Submission
-                              </button>
-                            )}
-                            {assignment.status === 'graded' && (
-                              <button className="btn btn-sm btn-outline-primary student-action-btn">
-                                <i className="bi bi-file-text"></i> View Feedback
-                              </button>
-                            )}
-                          </td>
+                      {assignments.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" className="text-center">No assignments assigned to you yet.</td>
                         </tr>
-                      ))}
+                      ) : (
+                        assignments.map(assignment => (
+                          <tr key={assignment._id}>
+                            <td>{assignment.title}</td>
+                            <td>{new Date(assignment.dueDate).toLocaleDateString()}</td>
+                            <td>{getStatusBadge(assignment.status)}</td>
+                            <td>
+                              {assignment.submission?.grade !== null && assignment.submission?.grade !== undefined ? (
+                                <span className="student-grade">
+                                  {assignment.submission.grade}/{assignment.maxScore}
+                                </span>
+                              ) : (
+                                <span className="text-muted">-</span>
+                              )}
+                            </td>
+                            <td>
+                              {assignment.status === 'pending' && (
+                                <button 
+                                  className="btn btn-sm btn-primary student-action-btn"
+                                  onClick={() => openSubmitModal(assignment)}
+                                >
+                                  <i className="bi bi-upload"></i> Submit
+                                </button>
+                              )}
+                              {assignment.status === 'submitted' && (
+                                <button 
+                                  className="btn btn-sm btn-outline-secondary student-action-btn"
+                                  onClick={() => openSubmitModal(assignment)}
+                                >
+                                  <i className="bi bi-eye"></i> View Submission
+                                </button>
+                              )}
+                              {assignment.status === 'graded' && assignment.submission?.feedback && (
+                                <button 
+                                  className="btn btn-sm btn-outline-primary student-action-btn"
+                                  onClick={() => alert(`Feedback: ${assignment.submission.feedback}`)}
+                                >
+                                  <i className="bi bi-file-text"></i> View Feedback
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -139,6 +197,55 @@ function StudentDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Submit Assignment Modal */}
+      {showSubmitModal && selectedAssignment && (
+        <div className="modal-overlay" onClick={() => setShowSubmitModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Submit Assignment: {selectedAssignment.title}</h3>
+              <button className="modal-close" onClick={() => setShowSubmitModal(false)}>×</button>
+            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <p><strong>Description:</strong> {selectedAssignment.description}</p>
+                  <p><strong>Due Date:</strong> {new Date(selectedAssignment.dueDate).toLocaleDateString()}</p>
+                  <p><strong>Max Score:</strong> {selectedAssignment.maxScore}</p>
+                </div>
+                <div className="form-group mb-3">
+                  <label>Your Submission *</label>
+                  <textarea
+                    className="form-control"
+                    value={submissionText}
+                    onChange={(e) => setSubmissionText(e.target.value)}
+                    required
+                    rows="8"
+                    placeholder="Enter your assignment answer here..."
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary"
+                  onClick={() => setShowSubmitModal(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  disabled={loading}
+                >
+                  {loading ? 'Submitting...' : 'Submit Assignment'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
