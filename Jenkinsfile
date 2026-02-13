@@ -52,16 +52,24 @@ pipeline {
         stage('Push Backend Image') {
             steps {
                 echo 'Pushing Backend Image to Docker Hub...'
-                bat "docker push ${BACKEND_IMAGE}:${BUILD_NUMBER}"
-                bat "docker push ${BACKEND_IMAGE}:latest"
+                retry(3) {
+                    bat "docker push ${BACKEND_IMAGE}:${BUILD_NUMBER}"
+                }
+                retry(3) {
+                    bat "docker push ${BACKEND_IMAGE}:latest"
+                }
             }
         }
         
         stage('Push Frontend Image') {
             steps {
                 echo 'Pushing Frontend Image to Docker Hub...'
-                bat "docker push ${FRONTEND_IMAGE}:${BUILD_NUMBER}"
-                bat "docker push ${FRONTEND_IMAGE}:latest"
+                retry(3) {
+                    bat "docker push ${FRONTEND_IMAGE}:${BUILD_NUMBER}"
+                }
+                retry(3) {
+                    bat "docker push ${FRONTEND_IMAGE}:latest"
+                }
             }
         }
         
