@@ -14,7 +14,7 @@ function Home() {
       {/* Hero Section */}
       <section className="hero-section d-flex align-items-center justify-content-center">
         <div className="text-center px-3 px-md-5">
-          <h1 className="display-3 hero-title mb-3">Senumi</h1>
+          <h1 className="display-3 hero-title mb-3">senumi</h1>
           <p className="lead mb-4" style={{ fontSize: '1.5rem' }}>
             Empowering teachers and students to collaborate, manage, and excel in academic assignments—anytime, anywhere.
           </p>
