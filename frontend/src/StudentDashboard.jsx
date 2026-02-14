@@ -81,7 +81,7 @@ function StudentDashboard() {
               <h2 className="mb-2">
                 Welcome, <span style={{ color: '#fde047' }}>{user?.username}</span>!
               </h2>
-              <p className="mb-0" style={{ opacity: 0.9 }}>Student Dashboard</p>
+              <p className="mb-0" style={{ opacity: 0.9 }}>Student Dashboard (Live v2)</p>
             </div>
           </div>
         </div>

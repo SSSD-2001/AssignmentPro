@@ -27,9 +27,6 @@ apt-get install -y git htop curl wget
 mkdir -p /opt/assignmentpro
 cd /opt/assignmentpro
 
-# Clone application (replace with your repo)
-git clone https://github.com/SSSD-2001/AssignmentPro.git .
-
 # Create production docker-compose file
 cat > docker-compose.prod.yml << 'EOF'
 version: '3.8'
@@ -68,8 +65,10 @@ volumes:
   mongo_data:
 EOF
 
-# Login to Docker Hub
-echo "${docker_registry_pass}" | docker login -u "${docker_registry_user}" --password-stdin
+# Login to Docker Hub if credentials are provided
+if [ -n "${docker_registry_pass}" ]; then
+  echo "${docker_registry_pass}" | docker login -u "${docker_registry_user}" --password-stdin
+fi
 
 # Pull and start containers
 docker compose -f docker-compose.prod.yml up -d
